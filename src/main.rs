@@ -10,7 +10,7 @@ mod args;
 const REPORT_FILE: &str = "report.pdf";
 const TMP_FILE: &str = "tmp.typ";
 
-fn compile_to_pdf(report: &str) {
+fn compile_report(report: &str) {
     // Write report to temporary file
     let mut tmp_file = OpenOptions::new()
         .write(true)
@@ -18,8 +18,10 @@ fn compile_to_pdf(report: &str) {
         .open(TMP_FILE)
         .expect("Failed to open temporary file");
     tmp_file.write_all(report.as_bytes()).unwrap();
+
     // Close file
     drop(tmp_file);
+
     // Use typst to compile the file
     Command::new("typst")
         .args(["compile", TMP_FILE, REPORT_FILE])
@@ -27,6 +29,7 @@ fn compile_to_pdf(report: &str) {
         .expect("Failed to execute typst")
         .wait()
         .expect("Failed to wait for typst");
+
     // Remove the temporary file
     remove_file(TMP_FILE).expect("Failed to remove temporary file");
 }
@@ -49,7 +52,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 for element in context {
                     report = report.replace(&format!("{{{{ {} }}}}", &element.0), &element.1);
                 }
-                compile_to_pdf(&report);
+                compile_report(&report);
             }
             _ => {
                 eprintln!("Incorrect subcommand. Check --help");
