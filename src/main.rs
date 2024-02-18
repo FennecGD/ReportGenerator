@@ -47,12 +47,26 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(command) = args.subcommand {
         match command.as_ref() {
-            "new" => (),
+            "new" => {
+                /*
+                   report
+                   - metadata.txt (title, prepared_for, prepared_by, section_order)
+                   - content (by default: summary.txt, methodology.txt, scope.txt)
+                   - - section.txt (file name: section name, inside is the section content)
+                   - findings
+                   - - finding.txt (file name: finding name (ability to ovewrite the name), inside is the finding content + first lines ability to change things)
+                */
+            }
             "compile" => {
                 let current_date = get_current_date();
                 let report_title = "Pentest Report";
                 let prepared_for = "Example Data";
                 let prepared_by = "Example Data";
+
+                // TODO: Table of contents, summary, methodology, scope, findings (+evidence)
+                // TODO: Special last page (maybe empty? with some text at the bottom?)
+                // TODO: Maybe a universal way of adding new sections? so to not implement all of
+                // them separately?
 
                 let mut report = REPORT_TEMPLATE.to_owned();
                 let context: Vec<(&str, &str)> = vec![
