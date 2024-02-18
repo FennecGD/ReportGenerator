@@ -1,6 +1,7 @@
+use chrono::Local;
 use std::{
     error::Error,
-    fs::{read_to_string, remove_file, OpenOptions},
+    fs::{remove_file, OpenOptions},
     io::Write,
     process::Command,
 };
@@ -9,6 +10,7 @@ mod args;
 
 const REPORT_FILE: &str = "report.pdf";
 const TMP_FILE: &str = "tmp.typ";
+const REPORT_TEMPLATE: &str = include_str!("../others/template.typ");
 
 fn compile_report(report: &str) {
     // Write report to temporary file
@@ -34,6 +36,11 @@ fn compile_report(report: &str) {
     remove_file(TMP_FILE).expect("Failed to remove temporary file");
 }
 
+fn get_current_date() -> String {
+    let date = Local::now();
+    date.format("%B %d, %Y").to_string()
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let args = args::get_args();
     // println!("{args:?}");
@@ -42,12 +49,17 @@ fn main() -> Result<(), Box<dyn Error>> {
         match command.as_ref() {
             "new" => (),
             "compile" => {
-                let mut report = include_str!("../others/template.typ").to_string();
+                let current_date = get_current_date();
+                let report_title = "Pentest Report";
+                let prepared_for = "Example Data";
+                let prepared_by = "Example Data";
+
+                let mut report = REPORT_TEMPLATE.to_owned();
                 let context: Vec<(&str, &str)> = vec![
-                    ("report_title", "Pentest Report"),
-                    ("date", "January 01, 2024"),
-                    ("prepared_for", "Example Data"),
-                    ("prepared_by", "Example Data"),
+                    ("report_title", report_title),
+                    ("date", &current_date),
+                    ("prepared_for", prepared_for),
+                    ("prepared_by", prepared_by),
                 ];
                 for element in context {
                     report = report.replace(&format!("{{{{ {} }}}}", &element.0), &element.1);
