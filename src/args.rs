@@ -7,7 +7,7 @@ pico_args_helpgen::define_app! {
     version_args: "-V, --version",
 
     struct AppArgs {
-        subcommand: Option<String>, "", "The subcommand to execute (new / compile)",
+        subcommand: Option<String>, "new, compile", "The subcommand to execute",
     }
 }
 

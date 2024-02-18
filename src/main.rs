@@ -10,8 +10,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         match command.as_ref() {
             "new" => (),
             "compile" => (),
-            _ => (),
+            _ => {
+                eprintln!("Incorrect subcommand. Check --help");
+                std::process::exit(1);
+            }
         }
+    } else {
+        // GUI
     }
 
     Ok(())

@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "pico-args-helpgen"
 version = "0.1.0"
-source = "git+https://github.com/Ernest1338/pico-args-helpgen#76db62e9816047c0dabec96ec5b965d17cbc5431"
+source = "git+https://github.com/Ernest1338/pico-args-helpgen#f3d39af7768709cb040459d50f398d50c32a6f2d"
 
 [[package]]
 name = "report-generator"
