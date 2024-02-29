@@ -1,9 +1,9 @@
 use chrono::Local;
 use std::{
     error::Error,
-    fs::{remove_file, OpenOptions},
+    fs::{create_dir, remove_file, File, OpenOptions},
     io::Write,
-    process::Command,
+    process::{exit, Command},
 };
 
 mod args;
@@ -48,14 +48,52 @@ fn main() -> Result<(), Box<dyn Error>> {
     if let Some(command) = args.subcommand {
         match command.as_ref() {
             "new" => {
+                // Ensure user provided the report path
+                let report_path = args.dir.unwrap_or_else(|| {
+                    eprintln!("ERROR: Report path not provided");
+                    exit(1);
+                });
+
+                // If directory not empty, then error out
+                if report_path.exists() {
+                    eprintln!("ERROR: Directory already exists");
+                    exit(1);
+                }
+
                 /*
                    report
-                   - metadata.txt (title, prepared_for, prepared_by, section_order)
-                   - content (by default: summary.txt, methodology.txt, scope.txt)
-                   - - section.txt (file name: section name, inside is the section content)
+                   - metadata.txt (title, prepared_for, prepared_by, section_order (as TODO))
+                   - sections (by default: summary.txt, methodology.txt, scope.txt)
+                   - - section.txt (file name is section name by default (can overwrite with: title:newtitle in the first line), inside is the section content)
                    - findings
                    - - finding.txt (file name: finding name (ability to ovewrite the name), inside is the finding content + first lines ability to change things)
                 */
+
+                // Create the file structure
+                create_dir(&report_path)?;
+
+                let mut f_metadata = File::create_new(&report_path.join("metadata.txt"))?;
+                f_metadata.write_all(
+                    b"title:Example Report
+prepared_for:Example prepared for
+prepared_by:Example prepared by",
+                )?;
+
+                create_dir(&report_path.join("sections"))?;
+                let mut f_section =
+                    File::create_new(&report_path.join("sections").join("example_section.txt"))?;
+                f_section.write_all(
+                    b"title:Example section
+Look at this gorgeus sections content",
+                )?;
+
+                create_dir(&report_path.join("findings"))?;
+                let mut f_finding =
+                    File::create_new(&report_path.join("findings").join("example_finding.txt"))?;
+                f_finding.write_all(
+                    b"title:Example finding
+Look at this amazing finding",
+                )?;
             }
             "compile" => {
                 let current_date = get_current_date();
@@ -76,7 +114,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     ("prepared_by", prepared_by),
                 ];
                 for element in context {
-                    report = report.replace(&format!("{{{{ {} }}}}", &element.0), &element.1);
+                    report = report.replace(&format!("{{{{ {} }}}}", element.0), element.1);
                 }
                 compile_report(&report);
             }
@@ -87,6 +125,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     } else {
         // GUI
+        todo!("GUI");
     }
 
     Ok(())
