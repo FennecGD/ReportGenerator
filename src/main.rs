@@ -117,7 +117,7 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
 
     let current_date = get_current_date();
 
-    // TODO: Table of contents, summary, methodology, scope, findings (+evidence)
+    // TODO: Summary, methodology, scope, findings (+evidence)
     // TODO: Special last page (maybe empty? with some text at the bottom?)
 
     let mut report = REPORT_TEMPLATE.to_owned();
