@@ -9,6 +9,7 @@ pico_args_helpgen::define_app! {
     struct AppArgs {
         subcommand: Option<String>, "new, compile", "The subcommand to execute",
         dir: Option<std::path::PathBuf>, "[directory]", "Report directory",
+        output: Option<String>, "-o", "\tOutput file",
     }
 }
 
@@ -20,6 +21,7 @@ fn parse_args() -> Result<AppArgs, pico_args_helpgen::Error> {
     let args = AppArgs {
         subcommand: pargs.subcommand()?,
         dir: pargs.opt_free_from_str()?,
+        output: pargs.opt_value_from_str("-o")?,
     };
 
     let remaining = pargs.finish();

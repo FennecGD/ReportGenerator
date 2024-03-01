@@ -23,7 +23,7 @@ mod args;
    - - 1.finding.typ
 */
 
-const REPORT_FILE: &str = "report.pdf";
+const DEFAULT_REPORT_FILE: &str = "report.pdf";
 const TMP_FILE: &str = "tmp.typ";
 const REPORT_TEMPLATE: &str = include_str!("../others/template.typ");
 
@@ -51,7 +51,7 @@ const EXAMPLE_SCOPE: &str = "= Scope
 Example scope
 #lorem(200)";
 
-fn compile_to_file(report: &str) -> Result<(), Box<dyn Error>> {
+fn compile_to_file(report: &str, output: &Option<String>) -> Result<(), Box<dyn Error>> {
     // Write report to temporary file
     let mut tmp_file = OpenOptions::new()
         .write(true)
@@ -63,9 +63,15 @@ fn compile_to_file(report: &str) -> Result<(), Box<dyn Error>> {
     // Close file
     drop(tmp_file);
 
+    let report_output_file = if let Some(file_name) = output {
+        file_name
+    } else {
+        DEFAULT_REPORT_FILE
+    };
+
     // Use typst to compile the file
     Command::new("typst")
-        .args(["compile", TMP_FILE, REPORT_FILE])
+        .args(["compile", TMP_FILE, report_output_file])
         .spawn()
         .expect("Failed to execute typst")
         .wait()
@@ -82,7 +88,10 @@ fn get_current_date() -> String {
     date.format("%B %d, %Y").to_string()
 }
 
-fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
+fn compile_report(
+    report_dir: Option<PathBuf>,
+    output: Option<String>,
+) -> Result<(), Box<dyn Error>> {
     // Ensure user provided the report path
     let report_path = report_dir.unwrap_or_else(|| {
         eprintln!("ERROR: Report path not provided");
@@ -127,7 +136,7 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
             .to_str()
             .unwrap()
             .split('.')
-            .nth(0)
+            .next()
             .unwrap()
             .parse::<usize>()?;
         sections[id - 1] = format!("\n#pagebreak()\n{content}");
@@ -144,7 +153,7 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
             .to_str()
             .unwrap()
             .split('.')
-            .nth(0)
+            .next()
             .unwrap()
             .parse::<usize>()?;
         findings[id - 1] = format!("\n#pagebreak()\n{content}");
@@ -167,7 +176,7 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
         report = report.replace(&format!("{{{{ {} }}}}", element.0), element.1);
     }
 
-    compile_to_file(&report)?;
+    compile_to_file(&report, &output)?;
 
     Ok(())
 }
@@ -221,7 +230,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 new_report(args.dir)?;
             }
             "compile" => {
-                compile_report(args.dir)?;
+                compile_report(args.dir, args.output)?;
             }
             _ => {
                 eprintln!("Incorrect subcommand. Check --help");
