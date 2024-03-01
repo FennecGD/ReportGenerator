@@ -9,16 +9,18 @@ use std::{
 
 mod args;
 
+// TODO: templates for default finding (+evidence), common vulns, default section
+
 /*
    report
-   - metadata.typ (title, prepared_for, prepared_by, section_order (TODO))
-   - sections (by default: summary.typ, methodology.typ, scope.typ)
-   - - summary.typ
-   - - methodology.typ
-   - - scope.typ
-   - - section.typ (file name is section name by default (can overwrite with: title:newtitle in the first line), inside is the section content)
+   - metadata.typ
+   - sections
+   - - 1.summary.typ
+   - - 2.scope.typ
+   - - 3.methodology.typ
+   - - 4.section.typ
    - findings
-   - - finding.typ (file name: finding name (ability to ovewrite the name), inside is the finding content + first lines ability to change things)
+   - - 1.finding.typ
 */
 
 const REPORT_FILE: &str = "report.pdf";
@@ -27,9 +29,7 @@ const REPORT_TEMPLATE: &str = include_str!("../others/template.typ");
 
 const EXAMPLE_METADATA: &str = "title:Example Pentest Report
 prepared_for:Example prepared for
-prepared_by:Example prepared by
-section_order:summary.typ,example_section.typ,methodology.typ,scope.typ
-findings_order:example_finding.typ";
+prepared_by:Example prepared by";
 
 const EXAMPLE_SECTION: &str = "= Example section
 Look at this gorgeus sections content
@@ -98,8 +98,6 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
     let mut report_title = "[REPORT TITLE - CHANGE ME]";
     let mut prepared_for = "[PREPARED FOR - CHANGE ME]";
     let mut prepared_by = "[PREPARED BY - CHANGE ME]";
-    let mut sections = String::new();
-    let mut findings = String::new();
 
     let mut metadata = String::new();
     File::open(report_path.join("metadata.typ"))?.read_to_string(&mut metadata)?;
@@ -119,25 +117,46 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
     }
 
     // Handle sections
+    let mut sections = vec![String::new(); read_dir(report_path.join("sections"))?.count()];
     for section in read_dir(report_path.join("sections"))? {
         let section = section?;
         let mut content = String::new();
         File::open(section.path())?.read_to_string(&mut content)?;
-        sections.push_str(&format!("\n#pagebreak()\n{content}"));
+        let id = section
+            .file_name()
+            .to_str()
+            .unwrap()
+            .split('.')
+            .nth(0)
+            .unwrap()
+            .parse::<usize>()?;
+        sections[id - 1] = format!("\n#pagebreak()\n{content}");
     }
 
     // Handle findings
+    let mut findings = vec![String::new(); read_dir(report_path.join("findings"))?.count()];
     for finding in read_dir(report_path.join("findings"))? {
         let finding = finding?;
         let mut content = String::new();
         File::open(finding.path())?.read_to_string(&mut content)?;
-        findings.push_str(&format!("\n#pagebreak()\n{content}"));
+        let id = finding
+            .file_name()
+            .to_str()
+            .unwrap()
+            .split('.')
+            .nth(0)
+            .unwrap()
+            .parse::<usize>()?;
+        findings[id - 1] = format!("\n#pagebreak()\n{content}");
     }
 
     let current_date = get_current_date();
 
-    // TODO: Summary, methodology, scope, findings (+evidence)
+    // TODO: Summary, methodology, scope, findings (+evidence (template))
     // TODO: Special last page (maybe empty? with some text at the bottom?)
+
+    let sections = sections.join("\n");
+    let findings = findings.join("\n");
 
     let mut report = REPORT_TEMPLATE.to_owned();
     let context: Vec<(&str, &str)> = vec![
@@ -177,18 +196,18 @@ fn new_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
 
     create_dir(report_path.join("sections"))?;
 
-    File::create_new(report_path.join("sections").join("example_section.typ"))?
-        .write_all(EXAMPLE_SECTION.as_bytes())?;
-    File::create_new(report_path.join("sections").join("summary.typ"))?
+    File::create_new(report_path.join("sections").join("1.summary.typ"))?
         .write_all(EXAMPLE_SUMMARY.as_bytes())?;
-    File::create_new(report_path.join("sections").join("methodology.typ"))?
-        .write_all(EXAMPLE_METHODOLOGY.as_bytes())?;
-    File::create_new(report_path.join("sections").join("scope.typ"))?
+    File::create_new(report_path.join("sections").join("2.scope.typ"))?
         .write_all(EXAMPLE_SCOPE.as_bytes())?;
+    File::create_new(report_path.join("sections").join("3.methodology.typ"))?
+        .write_all(EXAMPLE_METHODOLOGY.as_bytes())?;
+    File::create_new(report_path.join("sections").join("4.example_section.typ"))?
+        .write_all(EXAMPLE_SECTION.as_bytes())?;
 
     create_dir(report_path.join("findings"))?;
 
-    File::create_new(report_path.join("findings").join("example_finding.typ"))?
+    File::create_new(report_path.join("findings").join("1.example_finding.typ"))?
         .write_all(EXAMPLE_FINDING.as_bytes())?;
 
     Ok(())
@@ -200,6 +219,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(command) = args.subcommand {
         match command.as_ref() {
+            // TODO: new finding command (name + optional template)
+            // TODO: new section command (name + optional template)
             "new" => {
                 new_report(args.dir)?;
             }
