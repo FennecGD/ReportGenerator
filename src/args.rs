@@ -7,7 +7,7 @@ pico_args_helpgen::define_app! {
     version_args: "-V, --version",
 
     struct AppArgs {
-        subcommand: Option<String>, "new, compile", "The subcommand to execute",
+        subcommand: Option<String>, "new, compile, new-section, new-finding", "The subcommand to execute",
         dir: Option<std::path::PathBuf>, "[directory]", "Report directory",
         output: Option<String>, "-o", "\tOutput file",
     }

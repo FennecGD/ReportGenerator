@@ -224,13 +224,19 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(command) = args.subcommand {
         match command.as_ref() {
-            // TODO: new finding command (name + optional template)
-            // TODO: new section command (name + optional template)
             "new" => {
                 new_report(args.dir)?;
             }
             "compile" => {
                 compile_report(args.dir, args.output)?;
+            }
+            "new-section" => {
+                // TODO: new section command (name + optional template)
+                todo!("New Section");
+            }
+            "new-finding" => {
+                // TODO: new finding command (name + optional template)
+                todo!("New Finding");
             }
             _ => {
                 eprintln!("Incorrect subcommand. Check --help");
