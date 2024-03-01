@@ -13,6 +13,8 @@ Prepared for: {{ prepared_for }}
 == Prepared by:
 {{ prepared_by }}
 
-#pagebreak()
+#set align(left)
 
-= Thing 1
+{{ sections }}
+
+{{ findings }}

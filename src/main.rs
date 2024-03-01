@@ -1,7 +1,7 @@
 use chrono::Local;
 use std::{
     error::Error,
-    fs::{create_dir, remove_file, File, OpenOptions},
+    fs::{create_dir, read_dir, remove_file, File, OpenOptions},
     io::{Read, Write},
     path::PathBuf,
     process::{exit, Command},
@@ -26,10 +26,10 @@ const EXAMPLE_METADATA: &str = "title:Example Pentest Report
 prepared_for:Example prepared for
 prepared_by:Example prepared by";
 
-const EXAMPLE_SECTION: &str = "title:Example section
+const EXAMPLE_SECTION: &str = "= Example section
 Look at this gorgeus sections content";
 
-const EXAMPLE_FINDING: &str = "title:Example finding
+const EXAMPLE_FINDING: &str = "= Example finding
 Look at this amazing finding";
 
 fn compile_to_file(report: &str) -> Result<(), Box<dyn Error>> {
@@ -76,13 +76,16 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
         exit(1);
     }
 
-    let mut report_title = "CHANGE ME";
-    let mut prepared_for = "CHANGE ME";
-    let mut prepared_by = "CHANGE ME";
+    let mut report_title = "[REPORT TITLE - CHANGE ME]";
+    let mut prepared_for = "[PREPARED FOR - CHANGE ME]";
+    let mut prepared_by = "[PREPARED BY - CHANGE ME]";
+    let mut sections = String::new();
+    let mut findings = String::new();
 
     let mut metadata = String::new();
     File::open(report_path.join("metadata.txt"))?.read_to_string(&mut metadata)?;
 
+    // Handle metadata file
     for line in metadata.lines() {
         let split: Vec<&str> = line.split(':').collect();
         if split.len() < 2 {
@@ -94,6 +97,22 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
             "prepared_by" => prepared_by = split[1],
             _ => (),
         }
+    }
+
+    // Handle sections
+    for section in read_dir(report_path.join("sections"))? {
+        let section = section?;
+        let mut content = String::new();
+        File::open(section.path())?.read_to_string(&mut content)?;
+        sections.push_str(&format!("\n#pagebreak()\n{content}"));
+    }
+
+    // Handle findings
+    for finding in read_dir(report_path.join("findings"))? {
+        let finding = finding?;
+        let mut content = String::new();
+        File::open(finding.path())?.read_to_string(&mut content)?;
+        findings.push_str(&format!("\n#pagebreak()\n{content}"));
     }
 
     let current_date = get_current_date();
@@ -109,6 +128,8 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
         ("date", &current_date),
         ("prepared_for", prepared_for),
         ("prepared_by", prepared_by),
+        ("sections", &sections),
+        ("findings", &findings),
     ];
     for element in context {
         report = report.replace(&format!("{{{{ {} }}}}", element.0), element.1);
