@@ -11,11 +11,14 @@ mod args;
 
 /*
    report
-   - metadata.txt (title, prepared_for, prepared_by, section_order (as TODO))
-   - sections (by default: summary.txt, methodology.txt, scope.txt)
-   - - section.txt (file name is section name by default (can overwrite with: title:newtitle in the first line), inside is the section content)
+   - metadata.typ (title, prepared_for, prepared_by, section_order (TODO))
+   - sections (by default: summary.typ, methodology.typ, scope.typ)
+   - - summary.typ
+   - - methodology.typ
+   - - scope.typ
+   - - section.typ (file name is section name by default (can overwrite with: title:newtitle in the first line), inside is the section content)
    - findings
-   - - finding.txt (file name: finding name (ability to ovewrite the name), inside is the finding content + first lines ability to change things)
+   - - finding.typ (file name: finding name (ability to ovewrite the name), inside is the finding content + first lines ability to change things)
 */
 
 const REPORT_FILE: &str = "report.pdf";
@@ -24,13 +27,29 @@ const REPORT_TEMPLATE: &str = include_str!("../others/template.typ");
 
 const EXAMPLE_METADATA: &str = "title:Example Pentest Report
 prepared_for:Example prepared for
-prepared_by:Example prepared by";
+prepared_by:Example prepared by
+section_order:summary.typ,example_section.typ,methodology.typ,scope.typ
+findings_order:example_finding.typ";
 
 const EXAMPLE_SECTION: &str = "= Example section
-Look at this gorgeus sections content";
+Look at this gorgeus sections content
+#lorem(200)";
 
 const EXAMPLE_FINDING: &str = "= Example finding
-Look at this amazing finding";
+Look at this amazing finding
+#lorem(200)";
+
+const EXAMPLE_SUMMARY: &str = "= Summary
+Example summary content
+#lorem(200)";
+
+const EXAMPLE_METHODOLOGY: &str = "= Methodology
+Example methodology
+#lorem(200)";
+
+const EXAMPLE_SCOPE: &str = "= Scope
+Example scope
+#lorem(200)";
 
 fn compile_to_file(report: &str) -> Result<(), Box<dyn Error>> {
     // Write report to temporary file
@@ -83,7 +102,7 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
     let mut findings = String::new();
 
     let mut metadata = String::new();
-    File::open(report_path.join("metadata.txt"))?.read_to_string(&mut metadata)?;
+    File::open(report_path.join("metadata.typ"))?.read_to_string(&mut metadata)?;
 
     // Handle metadata file
     for line in metadata.lines() {
@@ -154,16 +173,24 @@ fn new_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
     // Create the file structure
     create_dir(&report_path)?;
 
-    let mut f_metadata = File::create_new(report_path.join("metadata.txt"))?;
-    f_metadata.write_all(EXAMPLE_METADATA.as_bytes())?;
+    File::create_new(report_path.join("metadata.typ"))?.write_all(EXAMPLE_METADATA.as_bytes())?;
 
     create_dir(report_path.join("sections"))?;
-    let mut f_section = File::create_new(report_path.join("sections").join("example_section.txt"))?;
-    f_section.write_all(EXAMPLE_SECTION.as_bytes())?;
+
+    File::create_new(report_path.join("sections").join("example_section.typ"))?
+        .write_all(EXAMPLE_SECTION.as_bytes())?;
+    File::create_new(report_path.join("sections").join("summary.typ"))?
+        .write_all(EXAMPLE_SUMMARY.as_bytes())?;
+    File::create_new(report_path.join("sections").join("methodology.typ"))?
+        .write_all(EXAMPLE_METHODOLOGY.as_bytes())?;
+    File::create_new(report_path.join("sections").join("scope.typ"))?
+        .write_all(EXAMPLE_SCOPE.as_bytes())?;
 
     create_dir(report_path.join("findings"))?;
-    let mut f_finding = File::create_new(report_path.join("findings").join("example_finding.txt"))?;
-    f_finding.write_all(EXAMPLE_FINDING.as_bytes())?;
+
+    File::create_new(report_path.join("findings").join("example_finding.typ"))?
+        .write_all(EXAMPLE_FINDING.as_bytes())?;
+
     Ok(())
 }
 
