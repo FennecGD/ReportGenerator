@@ -119,8 +119,6 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
 
     // TODO: Table of contents, summary, methodology, scope, findings (+evidence)
     // TODO: Special last page (maybe empty? with some text at the bottom?)
-    // TODO: Maybe a universal way of adding new sections? so to not implement all of
-    // them separately?
 
     let mut report = REPORT_TEMPLATE.to_owned();
     let context: Vec<(&str, &str)> = vec![
@@ -183,7 +181,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             _ => {
                 eprintln!("Incorrect subcommand. Check --help");
-                std::process::exit(1);
+                exit(1);
             }
         }
     } else {
