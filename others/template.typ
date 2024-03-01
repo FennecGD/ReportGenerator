@@ -24,3 +24,7 @@ Prepared for: {{ prepared_for }}
 = Findings
 
 {{ findings }}
+
+#pagebreak()
+#set align(center)
+Generated using "Report Generator". Cool

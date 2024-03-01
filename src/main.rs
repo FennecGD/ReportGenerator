@@ -150,13 +150,9 @@ fn compile_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
         findings[id - 1] = format!("\n#pagebreak()\n{content}");
     }
 
-    let current_date = get_current_date();
-
-    // TODO: Summary, methodology, scope, findings (+evidence (template))
-    // TODO: Special last page (maybe empty? with some text at the bottom?)
-
     let sections = sections.join("\n");
     let findings = findings.join("\n");
+    let current_date = get_current_date();
 
     let mut report = REPORT_TEMPLATE.to_owned();
     let context: Vec<(&str, &str)> = vec![
