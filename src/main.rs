@@ -10,6 +10,7 @@ use std::{
 mod args;
 
 // TODO: templates for default finding (+evidence), common vulns, default section
+// TODO: move into multiple files
 
 /*
    report
