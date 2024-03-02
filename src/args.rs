@@ -1,7 +1,7 @@
 pico_args_helpgen::define_app! {
     app_name: "Report Generator",
     app_description: "Cyber Security Report Generator",
-    app_version: "v0.1.0",
+    app_version: "v1.0.0",
 
     help_args: "-h, --help",
     version_args: "-V, --version",
