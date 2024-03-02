@@ -29,7 +29,7 @@ fn compile_to_file(report: &str, output: &Option<String>) -> Result<(), Box<dyn 
     Command::new("typst")
         .args(["compile", TMP_FILE, output_file])
         .spawn()
-        .expect("Failed to execute typst")
+        .expect("Failed to execute typst\nEnsure you have 'typst' installed on your system")
         .wait()
         .expect("Failed to wait for typst");
 
