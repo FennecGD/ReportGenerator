@@ -8,6 +8,7 @@ mod template;
 mod compile_report;
 mod new_report;
 mod new_section;
+mod new_finding;
 
 // TODO: templates for default finding (+evidence), common vulns, default section
 // TODO: better looking template
@@ -39,8 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 new_section::new_section(args.dir, args.name, args.template)?;
             }
             "new-finding" => {
-                // TODO: new finding command (name + optional template)
-                todo!("New Finding");
+                new_finding::new_finding(args.dir, args.name, args.template)?;
             }
             _ => {
                 eprintln!("Incorrect subcommand. Check --help");
