@@ -2,6 +2,7 @@
 
 Requires:
 - Typst (https://typst.app/)
+- Rust nightly toolchain
 
 # License
 MIT

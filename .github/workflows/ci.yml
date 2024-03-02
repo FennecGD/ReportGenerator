@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        toolchain: ["stable", "nightly"]
+        toolchain: ["nightly"] # TODO: stable
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
