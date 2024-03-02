@@ -45,10 +45,13 @@ pub fn compile_report(
     report_dir: Option<PathBuf>,
     output: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
-    // Ensure user provided the report path
+    // Ensure user provided the report path or use current directory as default
     let report_path = report_dir.unwrap_or_else(|| {
-        eprintln!("ERROR: Report path not provided");
-        exit(1);
+        if File::open("metadata.typ").is_err() {
+            eprintln!("ERROR: current directory is not a valid report");
+            exit(1);
+        }
+        ".".into()
     });
 
     // If directory doesn't exist, error out
