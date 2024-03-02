@@ -21,15 +21,12 @@ fn compile_to_file(report: &str, output: &Option<String>) -> Result<(), Box<dyn 
     // Close file
     drop(tmp_file);
 
-    let report_output_file = if let Some(file_name) = output {
-        file_name
-    } else {
-        DEFAULT_REPORT_FILE
-    };
+    // User provided output file or DEFAULT_REPORT_FILE as fallback
+    let output_file = output.as_deref().unwrap_or(DEFAULT_REPORT_FILE);
 
     // Use typst to compile the file
     Command::new("typst")
-        .args(["compile", TMP_FILE, report_output_file])
+        .args(["compile", TMP_FILE, output_file])
         .spawn()
         .expect("Failed to execute typst")
         .wait()
