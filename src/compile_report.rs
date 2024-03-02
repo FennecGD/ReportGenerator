@@ -122,7 +122,7 @@ pub fn compile_report(
         ("sections", &sections),
         ("findings", &findings),
     ];
-    let report = Template::from_str(include_str!("../templates/template.typ")).render(&context);
+    let report = Template::from_str(REPORT_TEMPLATE).render(&context);
 
     compile_to_file(&report, &output)?;
 

@@ -34,14 +34,30 @@ pub fn new_section(
     let sections_count = read_dir(report_path.join("sections"))?.count();
     let new_section_fname = format!("{}.{name}.typ", sections_count + 1);
 
-    // Handle templates
-    if template.is_some() {
-        println!("templates");
+    let existing_templates = ["summary"];
+
+    if let Some(ref template) = template {
+        if !existing_templates.contains(&template.as_str()) {
+            eprintln!("Section not created\nExisting templates: {existing_templates:?}");
+            exit(1);
+        }
+    }
+
+    let mut f = File::options()
+        .create_new(true)
+        .write(true)
+        .open(report_path.join("sections").join(&new_section_fname))?;
+
+    if let Some(template) = template {
+        // Handle templates
+        match template.as_str() {
+            "summary" => {
+                f.write_all(include_str!("../templates/sections/summary.typ").as_bytes())?;
+            }
+            _ => ()
+        }
     } else {
-        let mut f = File::options()
-            .create_new(true)
-            .write(true)
-            .open(report_path.join("sections").join(&new_section_fname))?;
+        // Handle new default section
         f.write_all(EXAMPLE_SECTION.as_bytes())?;
     }
 
