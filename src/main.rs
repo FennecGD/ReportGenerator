@@ -1,12 +1,16 @@
 use std::{error::Error, process::exit};
 
 mod args;
-mod compile_report;
 mod consts;
-mod new_report;
 mod utils;
+mod template;
+
+mod compile_report;
+mod new_report;
+mod new_section;
 
 // TODO: templates for default finding (+evidence), common vulns, default section
+// TODO: better looking template
 
 /*
    report
@@ -32,8 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 compile_report::compile_report(args.dir, args.output)?;
             }
             "new-section" => {
-                // TODO: new section command (name + optional template)
-                todo!("New Section");
+                new_section::new_section(args.dir, args.name, args.template)?;
             }
             "new-finding" => {
                 // TODO: new finding command (name + optional template)

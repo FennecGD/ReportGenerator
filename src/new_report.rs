@@ -42,5 +42,7 @@ pub fn new_report(report_dir: Option<PathBuf>) -> Result<(), Box<dyn Error>> {
     File::create_new(report_path.join("findings").join("1.example_finding.typ"))?
         .write_all(EXAMPLE_FINDING.as_bytes())?;
 
+    println!("New report created successfully");
+
     Ok(())
 }

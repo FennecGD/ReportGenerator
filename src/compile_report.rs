@@ -1,12 +1,13 @@
 use std::{
     error::Error,
-    fs::{read_dir, remove_file, File, OpenOptions},
-    io::{Read, Write},
+    fs::{read_dir, read_to_string, remove_file, File, OpenOptions},
+    io::Write,
     path::PathBuf,
     process::{exit, Command},
 };
 
 use crate::consts::*;
+use crate::template::Template;
 use crate::utils::get_current_date;
 
 fn compile_to_file(report: &str, output: &Option<String>) -> Result<(), Box<dyn Error>> {
@@ -61,8 +62,7 @@ pub fn compile_report(
     let mut prepared_for = "[PREPARED FOR - CHANGE ME]";
     let mut prepared_by = "[PREPARED BY - CHANGE ME]";
 
-    let mut metadata = String::new();
-    File::open(report_path.join("metadata.typ"))?.read_to_string(&mut metadata)?;
+    let metadata = read_to_string(report_path.join("metadata.typ"))?;
 
     // Handle metadata file
     for line in metadata.lines() {
@@ -82,8 +82,7 @@ pub fn compile_report(
     let mut sections = vec![String::new(); read_dir(report_path.join("sections"))?.count()];
     for section in read_dir(report_path.join("sections"))? {
         let section = section?;
-        let mut content = String::new();
-        File::open(section.path())?.read_to_string(&mut content)?;
+        let content = read_to_string(section.path())?;
         let id = section
             .file_name()
             .to_str()
@@ -99,8 +98,7 @@ pub fn compile_report(
     let mut findings = vec![String::new(); read_dir(report_path.join("findings"))?.count()];
     for finding in read_dir(report_path.join("findings"))? {
         let finding = finding?;
-        let mut content = String::new();
-        File::open(finding.path())?.read_to_string(&mut content)?;
+        let content = read_to_string(finding.path())?;
         let id = finding
             .file_name()
             .to_str()
@@ -116,7 +114,6 @@ pub fn compile_report(
     let findings = findings.join("\n");
     let current_date = get_current_date();
 
-    let mut report = REPORT_TEMPLATE.to_owned();
     let context: Vec<(&str, &str)> = vec![
         ("report_title", report_title),
         ("date", &current_date),
@@ -125,11 +122,11 @@ pub fn compile_report(
         ("sections", &sections),
         ("findings", &findings),
     ];
-    for element in context {
-        report = report.replace(&format!("{{{{ {} }}}}", element.0), element.1);
-    }
+    let report = Template::from_str(include_str!("../templates/template.typ")).render(&context);
 
     compile_to_file(&report, &output)?;
+
+    println!("Report compiled successfully");
 
     Ok(())
 }

@@ -1,6 +1,5 @@
 pub const DEFAULT_REPORT_FILE: &str = "report.pdf";
 pub const TMP_FILE: &str = "tmp.typ";
-pub const REPORT_TEMPLATE: &str = include_str!("../others/template.typ");
 
 pub const EXAMPLE_METADATA: &str = "title:Example Pentest Report
 prepared_for:Example prepared for
