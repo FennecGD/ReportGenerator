@@ -48,11 +48,15 @@ pub fn new_finding(
         .write(true)
         .open(report_path.join("findings").join(&new_finding_fname))?;
 
+    // FIXME: make so it is not necessary to add code here on every template added
     if let Some(template) = template {
         // Handle templates
         match template.as_str() {
             "xss" => {
                 f.write_all(include_str!("../templates/findings/xss.typ").as_bytes())?;
+            }
+            "sql-injection" => {
+                f.write_all(include_str!("../templates/findings/sql-injection.typ").as_bytes())?;
             }
             _ => ()
         }

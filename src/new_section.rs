@@ -6,7 +6,7 @@ use std::{
     process::exit,
 };
 
-use crate::consts::EXAMPLE_SECTION;
+use crate::consts::*;
 
 pub fn new_section(
     report_dir: Option<PathBuf>,
@@ -48,11 +48,21 @@ pub fn new_section(
         .write(true)
         .open(report_path.join("sections").join(&new_section_fname))?;
 
+    // FIXME: make so it is not necessary to add code here on every template added
     if let Some(template) = template {
         // Handle templates
         match template.as_str() {
+            "default" => {
+                f.write_all(EXAMPLE_SECTION.as_bytes())?;
+            }
             "summary" => {
-                f.write_all(include_str!("../templates/sections/summary.typ").as_bytes())?;
+                f.write_all(EXAMPLE_SUMMARY.as_bytes())?;
+            }
+            "scope" => {
+                f.write_all(EXAMPLE_SCOPE.as_bytes())?;
+            }
+            "methodology" => {
+                f.write_all(EXAMPLE_METHODOLOGY.as_bytes())?;
             }
             _ => ()
         }
