@@ -31,7 +31,7 @@
 #set text(16pt)
 
 #text(size: 24pt, weight: 900)[{{ report_title }}] \
-{{ date }} \
+{{ current_date }} \
 #text(fill: blue)[Prepared for: ]{{ prepared_for }}
 
 #set align(right)

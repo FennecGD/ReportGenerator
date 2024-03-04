@@ -58,30 +58,6 @@ pub fn compile_report(
         exit(1);
     }
 
-    // FIXME: refactor to not require to add new variables each time I add something to the
-    //        metadata section
-    let mut report_title = "[REPORT TITLE - CHANGE ME]";
-    let mut company_website = "[COMPANY WEBSITE - CHANGE ME]";
-    let mut prepared_for = "[PREPARED FOR - CHANGE ME]";
-    let mut prepared_by = "[PREPARED BY - CHANGE ME]";
-
-    let metadata = read_to_string(report_path.join("metadata.typ"))?;
-
-    // Handle metadata file
-    for line in metadata.lines() {
-        let split: Vec<&str> = line.split(':').collect();
-        if split.len() < 2 {
-            continue;
-        }
-        match split[0] {
-            "title" => report_title = split[1],
-            "company_website" => company_website = split[1],
-            "prepared_for" => prepared_for = split[1],
-            "prepared_by" => prepared_by = split[1],
-            _ => (),
-        }
-    }
-
     // Handle sections
     let mut sections = vec![String::new(); read_dir(report_path.join("sections"))?.count()];
     for section in read_dir(report_path.join("sections"))? {
@@ -118,15 +94,22 @@ pub fn compile_report(
     let findings = findings.join("\n");
     let current_date = get_current_date();
 
-    let context: Vec<(&str, &str)> = vec![
-        ("report_title", report_title),
-        ("date", &current_date),
-        ("company_website", company_website),
-        ("prepared_for", prepared_for),
-        ("prepared_by", prepared_by),
+    let mut context: Vec<(&str, &str)> = vec![
         ("sections", &sections),
         ("findings", &findings),
+        ("current_date", &current_date),
     ];
+
+    // Handle metadata file
+    let metadata_file = read_to_string(report_path.join("metadata.typ"))?;
+    for line in metadata_file.lines() {
+        let split: Vec<&str> = line.split(':').collect();
+        if split.len() < 2 {
+            continue;
+        }
+        context.push((split[0], split[1]));
+    }
+
     let report = Template::from_str(MAIN_TEMPLATE).render(&context);
 
     compile_to_file(&report, &output)?;
