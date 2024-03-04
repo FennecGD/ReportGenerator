@@ -34,6 +34,7 @@ pub fn new_section(
     let sections_count = read_dir(report_path.join("sections"))?.count();
     let new_section_fname = format!("{}.{name}.typ", sections_count + 1);
 
+    // FIXME: this should not be necessary
     let existing_templates = ["summary"];
 
     if let Some(ref template) = template {
@@ -53,22 +54,25 @@ pub fn new_section(
         // Handle templates
         match template.as_str() {
             "default" => {
-                f.write_all(EXAMPLE_SECTION.as_bytes())?;
+                f.write_all(T_SECTION.as_bytes())?;
             }
             "summary" => {
-                f.write_all(EXAMPLE_SUMMARY.as_bytes())?;
+                f.write_all(T_SUMMARY.as_bytes())?;
             }
             "scope" => {
-                f.write_all(EXAMPLE_SCOPE.as_bytes())?;
+                f.write_all(T_SCOPE.as_bytes())?;
             }
             "methodology" => {
-                f.write_all(EXAMPLE_METHODOLOGY.as_bytes())?;
+                f.write_all(T_METHODOLOGY.as_bytes())?;
             }
-            _ => ()
+            _ => {
+                eprintln!("ERROR: Invalid template: {template}");
+                exit(1);
+            }
         }
     } else {
         // Handle new default section
-        f.write_all(EXAMPLE_SECTION.as_bytes())?;
+        f.write_all(T_SECTION.as_bytes())?;
     }
 
     println!("Added new section \"{new_section_fname}\"");

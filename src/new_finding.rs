@@ -6,7 +6,7 @@ use std::{
     process::exit,
 };
 
-use crate::consts::EXAMPLE_FINDING;
+use crate::consts::*;
 
 pub fn new_finding(
     report_dir: Option<PathBuf>,
@@ -34,6 +34,7 @@ pub fn new_finding(
     let findings_count = read_dir(report_path.join("findings"))?.count();
     let new_finding_fname = format!("{}.{name}.typ", findings_count + 1);
 
+    // FIXME: this should not be necessary
     let existing_templates = ["xss"];
 
     if let Some(ref template) = template {
@@ -53,16 +54,19 @@ pub fn new_finding(
         // Handle templates
         match template.as_str() {
             "xss" => {
-                f.write_all(include_str!("../templates/findings/xss.typ").as_bytes())?;
+                f.write_all(T_XSS.as_bytes())?;
             }
             "sql-injection" => {
-                f.write_all(include_str!("../templates/findings/sql-injection.typ").as_bytes())?;
+                f.write_all(T_SQL_INJECTION.as_bytes())?;
             }
-            _ => ()
+            _ => {
+                eprintln!("ERROR: Invalid template: {template}");
+                exit(1);
+            }
         }
     } else {
         // Handle new default finding
-        f.write_all(EXAMPLE_FINDING.as_bytes())?;
+        f.write_all(T_FINDING.as_bytes())?;
     }
 
     println!("Added new finding \"{new_finding_fname}\"");
