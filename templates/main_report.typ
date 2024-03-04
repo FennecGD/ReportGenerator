@@ -20,7 +20,7 @@
 
         #place(
             right,
-            text("www.pentestcompany.com")
+            text("{{ company_website }}")
         )
     ]
 )
@@ -28,11 +28,11 @@
 #block(height: 100pt)
 
 #set align(left)
-#set text(18pt)
+#set text(16pt)
 
 #text(size: 24pt, weight: 900)[{{ report_title }}] \
 {{ date }} \
-Prepared for: {{ prepared_for }}
+#text(fill: blue)[Prepared for: ]{{ prepared_for }}
 
 #set align(right)
 #set text(14pt)
@@ -40,12 +40,13 @@ Prepared for: {{ prepared_for }}
 #block(height: 100pt)
 
 #text(size: 20pt)[Prepared by:] \
-{{ prepared_by }}
+{{ prepared_by }} \
+{{ company_website }}
 
 #set align(left)
 
 #pagebreak()
-#outline()
+#outline(title: text(fill: blue)[Table of Contents])
 
 {{ sections }}
 
@@ -56,4 +57,4 @@ Prepared for: {{ prepared_for }}
 
 #pagebreak()
 #set align(center)
-Generated using "Report Generator". Cool
+= TODO: LAST PAGE CHANGE ME

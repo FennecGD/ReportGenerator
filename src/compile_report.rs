@@ -58,7 +58,10 @@ pub fn compile_report(
         exit(1);
     }
 
+    // FIXME: refactor to not require to add new variables each time I add something to the
+    //        metadata section
     let mut report_title = "[REPORT TITLE - CHANGE ME]";
+    let mut company_website = "[COMPANY WEBSITE - CHANGE ME]";
     let mut prepared_for = "[PREPARED FOR - CHANGE ME]";
     let mut prepared_by = "[PREPARED BY - CHANGE ME]";
 
@@ -72,6 +75,7 @@ pub fn compile_report(
         }
         match split[0] {
             "title" => report_title = split[1],
+            "company_website" => company_website = split[1],
             "prepared_for" => prepared_for = split[1],
             "prepared_by" => prepared_by = split[1],
             _ => (),
@@ -117,6 +121,7 @@ pub fn compile_report(
     let context: Vec<(&str, &str)> = vec![
         ("report_title", report_title),
         ("date", &current_date),
+        ("company_website", company_website),
         ("prepared_for", prepared_for),
         ("prepared_by", prepared_by),
         ("sections", &sections),

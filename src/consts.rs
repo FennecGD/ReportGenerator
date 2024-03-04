@@ -3,6 +3,7 @@ pub const TMP_FILE: &str = "tmp.typ";
 pub const REPORT_TEMPLATE: &str = include_str!("../templates/main_report.typ");
 
 pub const EXAMPLE_METADATA: &str = "title:Example Pentest Report
+company_website:www.pentestcompany.com
 prepared_for:Example prepared for
 prepared_by:Example prepared by
 ";
